@@ -52,7 +52,7 @@ const average = (arr) =>
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatchd] = useState(tempWatchedData);
+  const [watched, setWatched] = useState(tempWatchedData);
 
   return (
     <>
