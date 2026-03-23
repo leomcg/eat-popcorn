@@ -239,10 +239,10 @@ function Movie({ movie, onSelectMovie }) {
 function MovieDetails({ selectedID, onCloseMovie }) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const {
     Title: title,
-    Year: year,
     Poster: poster,
     Runtime: runtime,
     imdbRating,
@@ -255,22 +255,31 @@ function MovieDetails({ selectedID, onCloseMovie }) {
 
   useEffect(() => {
     async function getMovieDetails() {
-      setIsLoading(true);
-      const res = await fetch(
-        `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedID}`,
-      );
-      const data = await res.json();
-      setMovie(data);
-      setIsLoading(false);
+      try {
+        setError("");
+        setIsLoading(true);
+        const res = await fetch(`http://www.omdbapi.com/?apikey=${KEY}&i=${1}`);
+        const data = await res.json();
+        console.log(data);
+        if (data.Response === "False") throw new Error(data.Error);
+        setMovie(data);
+      } catch (err) {
+        console.log("err", err);
+        console.log(err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
     getMovieDetails();
   }, [selectedID]);
 
   return (
     <div className="details">
-      {isLoading ? (
-        <Loader />
-      ) : (
+      {isLoading && <Loader />}
+      {error && <ErrorMessage message={error} />}
+
+      {!isLoading && !error && (
         <>
           <header>
             <button onClick={onCloseMovie} className="btn-back">
