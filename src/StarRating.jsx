@@ -23,7 +23,6 @@ export default function StarRating({
   const [tempRating, setTempRating] = useState(0);
 
   const textStyle = {
-    lineHeight: "1",
     margin: "0",
     color,
     fontSize: `${size / 1.5}px`,

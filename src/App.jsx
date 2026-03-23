@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import StarRating from "./StarRating";
 
 // const tempMovieData = [
 //   {
@@ -102,7 +103,7 @@ export default function App() {
         setIsLoading(false);
       }
     }
-    if (query.length < 3) {
+    if (query.length < 2) {
       setMovies([]);
       setError("");
       return;
@@ -237,6 +238,7 @@ function Movie({ movie, onSelectMovie }) {
 
 function MovieDetails({ selectedID, onCloseMovie }) {
   const [movie, setMovie] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     Title: title,
@@ -251,45 +253,55 @@ function MovieDetails({ selectedID, onCloseMovie }) {
     Genre: genre,
   } = movie;
 
-  console.log(title, year);
   useEffect(() => {
     async function getMovieDetails() {
+      setIsLoading(true);
       const res = await fetch(
         `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedID}`,
       );
       const data = await res.json();
       setMovie(data);
+      setIsLoading(false);
     }
     getMovieDetails();
-  }, []);
+  }, [selectedID]);
 
   return (
     <div className="details">
-      <header>
-        <button onClick={onCloseMovie} className="btn-back">
-          &larr;
-        </button>
-        <img src={poster} alt={`Poster of ${movie} movie`} />
-        <div className="details-overview">
-          <h2>{title}</h2>
-          <p>
-            {released} &bull; {runtime}
-          </p>
-          <p>{genre}</p>
-          <p>
-            <span>⭐</span>
-            {imdbRating} IMDb rating
-          </p>
-        </div>
-      </header>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <header>
+            <button onClick={onCloseMovie} className="btn-back">
+              &larr;
+            </button>
+            <img src={poster} alt={`Poster of ${movie} movie`} />
+            <div className="details-overview">
+              <h2>{title}</h2>
+              <p>
+                {released} &bull; {runtime}
+              </p>
+              <p>{genre}</p>
+              <p>
+                <span>⭐</span>
+                {imdbRating} IMDb rating
+              </p>
+            </div>
+          </header>
 
-      <section>
-        <p>
-          <em>{plot}</em>
-        </p>
-        <p>Starring: {actors}</p>
-        <p>Directed by: {director}</p>
-      </section>
+          <section>
+            <div className="rating">
+              <StarRating maxRating={10} size={24} />
+            </div>
+            <p>
+              <em>{plot}</em>
+            </p>
+            <p>Starring: {actors}</p>
+            <p>Directed by: {director}</p>
+          </section>
+        </>
+      )}
     </div>
   );
 }
