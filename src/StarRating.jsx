@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const containerStyle = {
   display: "flex",
@@ -27,8 +27,6 @@ export default function StarRating({
     color,
     fontSize: `${size / 1.5}px`,
   };
-
-  useEffect(() => console.log(messages.length, maxRating));
 
   function handleRating(rating) {
     setRating(rating);
