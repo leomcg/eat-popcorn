@@ -94,12 +94,14 @@ export default function App() {
   }
 
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchMovies() {
       try {
         setIsLoading(true);
         setError("");
         const res = await fetch(
           `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+          { signal: controller.signal },
         );
         if (!res.ok) throw new Error("Something went wrong");
         const data = await res.json();
@@ -117,6 +119,8 @@ export default function App() {
       return;
     }
     fetchMovies();
+
+    return () => controller.abort();
   }, [query]);
 
   return (
@@ -293,6 +297,25 @@ function MovieDetails({ selectedID, onCloseMovie, onAddWatched, watched }) {
     }
     getMovieDetails();
   }, [selectedID]);
+
+  useEffect(() => {
+    if (title) document.title = `Movie | ${title}`;
+
+    return () => {
+      document.title = "usePopcorn";
+    };
+  }, [title]);
+
+  useEffect(() => {
+    const callback = (e) => {
+      if (e.code === 'Escape') onCloseMovie()
+    }
+
+    document.addEventListener('keydown', callback)
+    
+    return ()=> document.removeEventListener('keydown', callback)
+
+  }, [onCloseMovie])
 
   function addWatched() {
     const newMovie = {
